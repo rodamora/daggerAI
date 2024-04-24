@@ -11,6 +11,10 @@
       "url": "https://opensource.org/licenses/MIT"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rodamora/daggerAI"
+  },
   "scripts": {
     "build": "yarn tsc",
     "sales_plan": "npx vite-node src/examples/sales_plan.ts",
