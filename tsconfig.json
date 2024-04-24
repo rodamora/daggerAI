@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "composite": true,
-    "module": "ESNext",
+    "module": "CommonJS",
     "target": "ESNext",
-    "moduleResolution": "Node",
+    "lib": ["ESNext"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "alwaysStrict": true,
     "noImplicitAny": true,
@@ -13,7 +15,6 @@
     "strictFunctionTypes": true,
     "jsx": "react-jsx",
     "noImplicitThis": true,
-    "resolveJsonModule": true,
     "strictBindCallApply": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -35,6 +36,6 @@
     "allowSyntheticDefaultImports": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*.ts", "src/**/*.json", "src/**/*.tsx", "vite.config.ts"],
+  "include": ["src/**/*.ts", "src/**/*.json", "src/**/*.tsx"],
   "exclude": ["node_modules/*"]
 }

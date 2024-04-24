@@ -13,6 +13,12 @@ export class SerperTool implements Tool {
     query: z.string(),
   })
 
+  constructor() {
+    if (!process.env.SERPER_API_KEY) {
+      throw new Error('SERPER_API_KEY environment variable is required')
+    }
+  }
+
   async execute(input: SerperToolParams): Promise<string> {
     const options: RequestInit = {
       method: 'POST',
@@ -35,7 +41,7 @@ export class SerperTool implements Tool {
       throw new Error(`Error calling Serper API: ${response.statusText}`)
     }
 
-    const json = await response.json()
+    const json = (await response.json()) as any
 
     if (json.answerBox?.answer) {
       return json.answerBox.answer
