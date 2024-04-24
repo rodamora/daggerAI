@@ -1,0 +1,44 @@
+{
+  "name": "daggerai",
+  "description": "A simple and powerful Typescript based agent framework to help businesses thrive in the AI Agent revolution.",
+  "version": "0.0.1",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "private": false,
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  ],
+  "scripts": {
+    "build": "yarn tsc",
+    "sales_plan": "npx vite-node src/examples/sales_plan.ts",
+    "blog_post": "npx vite-node src/examples/blog_post.ts"
+  },
+  "keywords": [
+    "AI",
+    "Agents",
+    "OpenAI",
+    "Anthropic"
+  ],
+  "author": {
+    "name": "Rodrigo Amora",
+    "email": "rodamora@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.6",
+    "nanoid": "^5.0.7",
+    "openai": "^4.38.3",
+    "typescript-graph": "^0.3.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10",
+    "vite-node": "^1.5.1"
+  }
+}
