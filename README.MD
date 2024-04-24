@@ -63,7 +63,14 @@ npm install daggerai
 ### 3. Create and run a Squad
 
 ```typescript
-import { Squad, Agent, Task, ChatOpenAI, ChatAnthropic } from 'daggerai'
+import {
+  Squad,
+  Agent,
+  SerperTool,
+  Task,
+  ChatOpenAI,
+  ChatAnthropic,
+} from 'daggerai'
 
 const squad = new Squad()
 
@@ -81,6 +88,10 @@ const llm = new ChatAnthropic({
 //   maxTokens: 4000,
 // })
 
+// Create the websearch tool
+process.env['SERP_API_KEY'] = 'your-serp-api-key'
+const serperTool = new SerperTool()
+
 const blogWriter = new Agent({
   role: 'Social Media Blog Writer',
   backstory:
@@ -93,7 +104,7 @@ const research = new Task({
   description: 'Research the topic for the blog post.',
   expectedOutput: 'A list of key points and sources for the blog post.',
   agent: blogWriter,
-  tools: [new SerperTool()],
+  tools: [serperTool],
   llm,
 })
 
