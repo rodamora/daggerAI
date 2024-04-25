@@ -1,12 +1,10 @@
 import { SquadEventEmitter } from './events'
 import { interpolateVariablesIntoPrompt } from './helpers'
 import { SQUAD_PROMPTS } from './prompts'
-import { z } from 'zod'
 
 export interface Tool {
   name: string
   description: string
-  schema: z.ZodSchema<any>
   execute: (input: any) => Promise<string>
 }
 
