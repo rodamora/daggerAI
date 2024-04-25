@@ -7,7 +7,7 @@ interface PerplexityToolParams {
 
 export class PerplexityTool implements Tool {
   api: OpenAI
-  name = 'Internet Search'
+  name = 'Perplexity Search'
   description =
     'Use this tool when you have questions about any subject that could be searched on the internet. The only param is a JSON object with the key "query".'
 

@@ -6,7 +6,7 @@ export interface SerperToolParams {
 }
 
 export class SerperTool implements Tool {
-  name: string = 'Internet Search'
+  name: string = 'Serper Search'
   description: string =
     'Use when you need to look up something on the internet. Input is a JSON with a key called "query".'
   schema: z.ZodSchema<SerperToolParams> = z.object({
