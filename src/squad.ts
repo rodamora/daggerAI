@@ -7,7 +7,6 @@ export class Squad {
   private env: Record<string, string> = {}
   private queue: string[] = []
   private order: Task[] = []
-
   private tasks: Task[] = []
 
   connect(from: Task, to: Task) {
