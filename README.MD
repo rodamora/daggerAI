@@ -89,7 +89,7 @@ const llm = new ChatAnthropic({
 // })
 
 // Create the websearch tool
-process.env['SERP_API_KEY'] = 'your-serp-api-key'
+process.env['SERPER_API_KEY'] = 'your-serper-api-key'
 const serperTool = new SerperTool()
 
 const blogWriter = new Agent({
