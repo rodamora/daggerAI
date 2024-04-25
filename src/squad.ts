@@ -1,10 +1,8 @@
 import { nanoid } from 'nanoid'
-import { SquadEvents } from './events'
-import { Task } from './task'
-import { EventEmitter } from 'stream'
 import { DirectedAcyclicGraph } from 'typescript-graph'
+import { Task } from './task'
 
-export class Squad extends EventEmitter<SquadEvents> {
+export class Squad {
   private graph: DirectedAcyclicGraph<string> = new DirectedAcyclicGraph()
   private env: Record<string, string> = {}
   private queue: string[] = []
