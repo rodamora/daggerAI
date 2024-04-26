@@ -1,5 +1,5 @@
 import { AgentParams } from './agent'
-import { LLMModel } from './llm/base'
+import { LLMModel } from '../llm/base'
 
 export interface SquadDefinition {
   tasks: TaskDefinition[]

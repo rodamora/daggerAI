@@ -3,7 +3,7 @@ import { EventEmitter } from 'stream'
 
 export type ToolRunEvent = ToolCall & { output?: string }
 export type AgentRunEvent = {
-  key: string
+  agent: string
   name: string
   task: string
   output: string

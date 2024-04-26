@@ -1,4 +1,4 @@
-import { Tool } from '../tool'
+import { Tool } from '../core/tool'
 import { z } from 'zod'
 
 export interface SerperToolParams {

@@ -24,9 +24,8 @@ export class ToolError {
 export class ToolRunner {
   runAttempts = 0
   maxRunAttemps = 5
-  emitter: SquadEventEmitter | null = null
 
-  constructor(public tools: Tool[]) {}
+  constructor(public tools: Tool[], public events: SquadEventEmitter) {}
 
   async run(calling: ToolCall) {
     const toolNames = this.tools.map(t => t.name).join(', ')
@@ -42,7 +41,7 @@ export class ToolRunner {
         },
       )
 
-      this.emitter?.emit('tool.failed', {
+      this.events.emit('tool.failed', {
         ...calling,
         output: 'Max attempts reached. Moving on.',
       })
@@ -54,7 +53,7 @@ export class ToolRunner {
     if (!selectedTool) {
       this.runAttempts++
 
-      this.emitter?.emit('tool.failed', {
+      this.events.emit('tool.failed', {
         ...calling,
         output: 'Action does not exist.',
       })
@@ -69,7 +68,7 @@ export class ToolRunner {
     if (!selectedToolHasName) {
       this.runAttempts++
 
-      this.emitter?.emit('tool.failed', {
+      this.events.emit('tool.failed', {
         ...calling,
         output: 'Forgot the action name.',
       })
@@ -80,9 +79,9 @@ export class ToolRunner {
     }
 
     try {
-      this.emitter?.emit('tool.called', calling)
+      this.events.emit('tool.called', calling)
       const output = await selectedTool.execute(calling.toolInput)
-      this.emitter?.emit('tool.finished', { ...calling, output })
+      this.events.emit('tool.finished', { ...calling, output })
 
       return output as string
     } catch (error) {

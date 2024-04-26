@@ -1,6 +1,8 @@
 import { nanoid } from 'nanoid'
 import { DirectedAcyclicGraph } from 'typescript-graph'
 import { Task } from './task'
+import { EventEmitter } from 'stream'
+import { SquadEvent } from './events'
 
 export class Squad {
   private graph: DirectedAcyclicGraph<string> = new DirectedAcyclicGraph()
@@ -9,31 +11,8 @@ export class Squad {
   private order: Task[] = []
   private tasks: Task[] = []
 
-  connect(from: Task, to: Task) {
-    const fromTask = this.tasks.find(t => t.id === from.id)!
-    const toTask = this.tasks.find(t => t.id === to.id)!
-
-    if (!fromTask || !toTask) {
-      throw new Error('Task not found')
-    }
-
-    fromTask.adjacentTo.push(to.id)
-    toTask.adjancentFrom.push(from.id)
-
-    this.graph.addEdge(from.graphId, to.graphId)
-  }
-
-  add(task: Task) {
-    task.id = nanoid()
-    task.graphId = this.graph.insert(task.id)
-    this.tasks.push(task)
-  }
-
-  sortedTasks() {
-    return this.graph
-      .topologicallySortedNodes()
-      .map(n => this.tasks.find(t => t.id === n)!)
-  }
+  // Event emitter to report on the squad's progress
+  public events: EventEmitter<SquadEvent> = new EventEmitter()
 
   async evaluate() {
     // Get the nodes in the graph in order of execution
@@ -80,5 +59,36 @@ export class Squad {
       .topologicallySortedNodes()
       .map(id => this.tasks.find(t => t.id === id)!)
     return sortedTasks.find(n => ids.includes(n.id))
+  }
+
+  connect(from: Task, to: Task) {
+    const fromTask = this.tasks.find(t => t.id === from.id)!
+    const toTask = this.tasks.find(t => t.id === to.id)!
+
+    if (!fromTask || !toTask) {
+      throw new Error('Task not found')
+    }
+
+    fromTask.adjacentTo.push(to.id)
+    toTask.adjancentFrom.push(from.id)
+
+    this.graph.addEdge(from.graphId, to.graphId)
+  }
+
+  add(task: Task) {
+    task.id = nanoid()
+    task.graphId = this.graph.insert(task.id)
+    this.tasks.push(task)
+  }
+
+  sortedTasks() {
+    return this.graph
+      .topologicallySortedNodes()
+      .map(n => this.tasks.find(t => t.id === n)!)
+  }
+
+  tasksById(ids: string[]) {
+    const allSquadTasks = this.sortedTasks()
+    return ids.map(t => allSquadTasks.find(task => task.id === t))
   }
 }

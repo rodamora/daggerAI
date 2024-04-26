@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { Tool } from '../tool'
+import { Tool } from '../core/tool'
 
 interface PerplexityToolParams {
   query: string

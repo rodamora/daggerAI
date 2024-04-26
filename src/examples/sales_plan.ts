@@ -1,8 +1,11 @@
-import '../env'
+import { resolve } from 'path'
+import dotenv from 'dotenv'
 
-import { Agent } from '../agent'
-import { Squad } from '../squad'
-import { Task } from '../task'
+dotenv.config({ path: resolve(__dirname, '../../', '.env') })
+
+import { Agent } from '../core/agent'
+import { Squad } from '../core/squad'
+import { Task } from '../core/task'
 import { ChatAnthropic } from '../llm/anthropic'
 
 async function runSquad() {
@@ -63,6 +66,31 @@ async function runSquad() {
 
   squad.connect(salesStrategy, salesPlan)
   squad.connect(salesPlan, salesResponsibilities)
+
+  // you can list to various events to get updates on the squad progress
+  squad.events.on('squad.started', () => {
+    console.log('Squad started!')
+  })
+
+  squad.events.on('agent.thinking', task => {
+    console.log(`Task started: ${task.name}`)
+  })
+
+  squad.events.on('agent.finished', task => {
+    console.log(`Task finished: ${task.output}`)
+  })
+
+  squad.events.on('tool.called', tool => {
+    console.log(`Tool called: ${tool.name}`)
+  })
+
+  squad.events.on('tool.finished', tool => {
+    console.log(`Tool finished: ${tool.name}`)
+  })
+
+  squad.events.on('squad.finished', () => {
+    console.log('Squad finished!')
+  })
 
   const results = await squad.evaluate()
   console.log(results)

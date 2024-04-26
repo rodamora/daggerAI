@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { SQUAD_PROMPTS } from '../prompts'
+import { SQUAD_PROMPTS } from '../core/prompts'
 import { LLM, LLMParams } from '../llm/base'
 
 export class ChatOpenAI implements LLM {

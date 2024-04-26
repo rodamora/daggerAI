@@ -16,7 +16,7 @@ import { SQUAD_PROMPTS } from './prompts'
 import { Squad } from './squad'
 import { Tool, ToolError, ToolRunner } from './tool'
 import { Agent } from './agent'
-import { LLM } from './llm/base'
+import { LLM } from '../llm/base'
 
 export class Task {
   graphId: string = ''
@@ -59,15 +59,14 @@ export class Task {
     let llmPrompt = this.buildInitialPrompt(squad)
 
     const llmParser = new SquadResponseParser()
-    const toolRunner = new ToolRunner(this.tools)
-    // toolRunner.emitter = this.emitter
+    const toolRunner = new ToolRunner(this.tools, squad.events)
 
-    // this.emitter?.emit('agent.thinking', {
-    //   key: this.agent.id,
-    //   name: this.agent.name,
-    //   task: task.id,
-    //   output: `Executing task *${task.name}*`,
-    // })
+    squad.events.emit('agent.thinking', {
+      agent: this.agent.role,
+      name: this.name,
+      task: this.id,
+      output: `Executing task *${this.name}*`,
+    })
 
     let intermediateSteps: [AgentAction | null, Observation | undefined][] = []
     let iterations = 0
@@ -190,10 +189,7 @@ export class Task {
       return taskPrompt
     }
 
-    const allSquadTasks = squad.sortedTasks()
-    const previousTasks = previousTasksIds.map(t =>
-      allSquadTasks.find(task => task.id === t),
-    )
+    const previousTasks = squad.tasksById(previousTasksIds)
     const taskContext = previousTasks.map(t => t?.output).join('\n')
 
     if (taskContext) {

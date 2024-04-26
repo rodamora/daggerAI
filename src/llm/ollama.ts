@@ -1,4 +1,4 @@
-import { SQUAD_PROMPTS } from '../prompts'
+import { SQUAD_PROMPTS } from '../core/prompts'
 import { LLM, LLMParams } from '../llm/base'
 
 export class ChatOllama implements LLM {
