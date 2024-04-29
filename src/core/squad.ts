@@ -1,8 +1,8 @@
 import { nanoid } from 'nanoid'
 import { DirectedAcyclicGraph } from 'typescript-graph'
 import { Task } from './task'
-import { EventEmitter } from 'stream'
-import { SquadEvent } from './events'
+import { SquadEventEmitter } from './events'
+import EventEmitter from 'events'
 
 export class Squad {
   private graph: DirectedAcyclicGraph<string> = new DirectedAcyclicGraph()
@@ -12,7 +12,7 @@ export class Squad {
   private tasks: Task[] = []
 
   // Event emitter to report on the squad's progress
-  public events: EventEmitter<SquadEvent> = new EventEmitter()
+  public events: SquadEventEmitter = new EventEmitter()
 
   async evaluate() {
     // Get the nodes in the graph in order of execution

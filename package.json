@@ -1,7 +1,7 @@
 {
   "name": "daggerai",
   "description": "A simple and powerful Typescript based agent framework to help businesses thrive in the AI Agent revolution.",
-  "version": "0.0.9",
+  "version": "0.0.13",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "private": false,
@@ -16,7 +16,7 @@
     "url": "https://github.com/rodamora/daggerAI"
   },
   "scripts": {
-    "build": "yarn tsc",
+    "build": "rimraf dist && yarn tsc",
     "sales_plan": "npx vite-node src/examples/sales_plan.ts",
     "blog_post": "npx vite-node src/examples/blog_post.ts"
   },
@@ -32,6 +32,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@types/node": "^20.12.7",
     "@anthropic-ai/sdk": "^0.20.6",
     "core-js": "^3.37.0",
     "nanoid": "3.3.5",
@@ -40,8 +41,8 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7",
     "dotenv": "^16.4.5",
+    "rimraf": "^5.0.5",
     "typescript": "^5.4.5",
     "vite": "^5.2.10",
     "vite-node": "^1.5.1"

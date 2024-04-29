@@ -1,5 +1,5 @@
+import EventEmitter from 'events'
 import { ToolCall } from './tool'
-import { EventEmitter } from 'stream'
 
 export type ToolRunEvent = ToolCall & { output?: string }
 export type AgentRunEvent = {
