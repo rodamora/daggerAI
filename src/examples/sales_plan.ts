@@ -1,5 +1,5 @@
-import { resolve } from 'path'
 import dotenv from 'dotenv'
+import { resolve } from 'path'
 
 dotenv.config({ path: resolve(__dirname, '../../', '.env') })
 
@@ -92,7 +92,7 @@ async function runSquad() {
     console.log('Squad finished!')
   })
 
-  const results = await squad.evaluate()
+  const results = await squad.evaluate({ inputs: [] })
   console.log(results)
 }
 

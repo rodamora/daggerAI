@@ -55,3 +55,15 @@ export function dedent(
   const dedented = lines.map(line => line.slice(minIndent))
   return dedented.join('\n')
 }
+
+export const removeDiacritics = (text: string): string => {
+  const a = 'àáäâãèéëêìíïîòóöôùúüûñçßÿœæŕśńṕẃǵǹḿǘẍźḧ·/_,:;'
+  const b = 'aaaaaeeeeiiiioooouuuuncsyoarsnpwgnmuxzh   ,  '
+  const p = new RegExp(a.split('').join('|'), 'g')
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(p, c => b.charAt(a.indexOf(c)))
+    .replace("'", '')
+}

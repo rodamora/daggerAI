@@ -6,20 +6,23 @@ interface PerplexityToolParams {
 }
 
 export class PerplexityTool implements Tool {
-  api: OpenAI
+  code: string = 'perplexity'
   name = 'Perplexity Search'
   description =
     'Use this tool when you have questions about any subject that could be searched on the internet. The only param is a JSON object with the key "query".'
 
+  params: Record<string, string> = {}
+
   constructor(apiKey?: string) {
-    this.api = new OpenAI({
-      apiKey: apiKey || process.env.PERPLEXITY_API_KEY,
-      baseURL: 'https://api.perplexity.ai',
-    })
+    this.params.apiKey = apiKey || process.env.PERPLEXITY_API_KEY!
   }
 
   async execute(input: PerplexityToolParams) {
-    const response = await this.api.chat.completions.create({
+    const api = new OpenAI({
+      apiKey: this.params.apiKey,
+      baseURL: 'https://api.perplexity.ai',
+    })
+    const response = await api.chat.completions.create({
       model: 'llama-3-8b-instruct',
       messages: [
         {

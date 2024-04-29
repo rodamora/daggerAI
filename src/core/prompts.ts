@@ -15,7 +15,7 @@ export const SQUAD_PROMPTS = {
     'I MUST either use a tool (use one at time) OR give my best final answer. To Use the following format:\n\nThought: you should always think about what to do\nAction: the action to take, should be one of [{toolNames}]\nAction Input: the input to the action, dictionary\nObservation: the result of the action\n... (this Thought/Action/Action Input/Observation can repeat N times)\nThought: I now can give a great answer\nFinal Answer: my best complete final answer to the task.\nYour final answer must be the great and the most complete as possible, it must be outcome described\n\n ',
   taskWithContext: "\n\nThis is the context you're working with:\n{context}",
   expectedOutput:
-    '\nYour Final Answer output is expected to follow these conditions: {expectedOutput}. Remember: You MUST return the actual complete content as the final answer (and not just a summary). Use this format Final Answer: complete content following the conditions.',
+    '\n\nYour Final Answer output is expected to follow these conditions: {expectedOutput}. Remember: You MUST return the actual complete content as the final answer (and not just a summary). Use this format Final Answer: complete content following the conditions.',
   kickoff:
     '\n\nBegin! This is VERY important to you, use the tools available and give your best Final Answer, your job depends on it!\n',
 } as const

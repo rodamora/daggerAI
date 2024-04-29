@@ -1,26 +1,27 @@
+import { LLM } from '../llm/base'
+import { Agent } from './agent'
 import {
   convertToXmlTag,
   dedent,
   interpolateVariablesIntoPrompt,
   logWithColor,
+  removeDiacritics,
 } from './helpers'
+import { Node } from './node'
 import {
   AgentAction,
-  Observation,
   AgentFinish,
   AgentStep,
+  Observation,
   ParserError,
   SquadResponseParser,
 } from './parser'
 import { SQUAD_PROMPTS } from './prompts'
 import { Squad } from './squad'
 import { Tool, ToolError, ToolRunner } from './tool'
-import { Agent } from './agent'
-import { LLM } from '../llm/base'
 
-export class Task {
-  graphId: string = ''
-  id: string = ''
+export class Task extends Node {
+  override type: string = 'task'
 
   agent: Agent
 
@@ -37,14 +38,9 @@ export class Task {
   // the max attemps to execute this task
   maxAttempts: number = 10
 
-  // controls the order of execution
-  adjacentTo: string[] = []
-  adjancentFrom: string[] = []
-
-  // the final output of the task
-  output: string | null = null
-
   constructor(params: TaskParams) {
+    super()
+    this.id = params.id || ''
     this.name = params.name
     this.description = params.description
     this.agent = params.agent
@@ -189,8 +185,8 @@ export class Task {
       return taskPrompt
     }
 
-    const previousTasks = squad.tasksById(previousTasksIds)
-    const taskContext = previousTasks.map(t => t?.output).join('\n')
+    const previousTasks = squad.nodesById(previousTasksIds)
+    const taskContext = previousTasks.map(t => t.nodeOutput()).join('\n')
 
     if (taskContext) {
       taskPrompt += interpolateVariablesIntoPrompt(
@@ -200,6 +196,13 @@ export class Task {
     }
 
     return dedent`${taskPrompt}`
+  }
+
+  getAdditionalInstructions(squad: Squad) {
+    if (squad.instructions) {
+      return `\n\n<additional_user_instructions>${squad.instructions}</additional_user_instructions>`
+    }
+    return ''
   }
 
   /**
@@ -220,13 +223,22 @@ export class Task {
     prompt += this.getCurrentTaskPrompt(squad)
     prompt += this.getUserInputsPrompt()
     prompt += this.getExpectedOutputPrompt()
+    prompt += this.getAdditionalInstructions(squad)
     prompt += this.getTaskKickoffPrompt()
 
     return dedent`${prompt}`
   }
+
+  override nodeOutput() {
+    return `${convertToXmlTag(
+      removeDiacritics(this.name).toLocaleLowerCase(),
+      this.output || '',
+    )}`
+  }
 }
 
 export interface TaskParams {
+  id?: string
   name: string
   description: string
   expectedOutput: string

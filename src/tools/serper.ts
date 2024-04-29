@@ -1,17 +1,15 @@
 import { Tool } from '../core/tool'
-import { z } from 'zod'
 
 export interface SerperToolParams {
   query: string
 }
 
 export class SerperTool implements Tool {
+  code: string = 'serper'
   name: string = 'Serper Search'
   description: string =
     'Use when you need to look up something on the internet. Input is a JSON with a key called "query".'
-  schema: z.ZodSchema<SerperToolParams> = z.object({
-    query: z.string(),
-  })
+  params: Record<string, string> = {}
 
   constructor() {
     if (!process.env.SERPER_API_KEY) {
