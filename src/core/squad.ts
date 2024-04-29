@@ -19,6 +19,7 @@ export class Squad {
   private queue: string[] = []
   private order: Task[] = []
   private nodes: Node[] = []
+  private history: string[] = []
   public events: SquadEventEmitter = new EventEmitter()
 
   // additional instructions the user can send to the squad
@@ -30,20 +31,22 @@ export class Squad {
     this.instructions = params.instructions || ''
 
     // find the nodes with no incoming edges
-    let inDegree: { [key: string]: number } = {}
+    let inDegree: { [id: string]: number } = {}
     for (const node of this.nodes) {
       inDegree[node.id] = node.adjancentFrom.length
     }
 
     // the queue starts with the nodes that have no incoming edges
-    this.queue = Object.keys(inDegree).filter(key => inDegree[key] === 0)
+    this.queue = Object.keys(inDegree).filter(id => inDegree[id] === 0)
 
     // the order the nodes were executed
     this.order = []
 
     // Keep running the loop until there are no more nodes to execute
     while (true) {
+      console.log('QUEUE:', this.queue)
       const nextNode = this.findNextNode(this.queue) as NodeTypes
+      console.log('RUNNING NODE:', nextNode?.name)
 
       if (!nextNode) {
         break
@@ -75,11 +78,17 @@ export class Squad {
         // Executes the node
         const taskResponse = await taskNode.execute(this)
         // Store the node response in the environment
-        this.env[nextNode.name] = taskResponse
+        ;(this.env as any)[taskNode.id] = taskResponse
       }
+
+      this.history.push(nextNode.id)
 
       // Add the IDs of the nodes that the current node is adjacent to to the queue
       for (const id of nextNode.adjacentTo) {
+        if (this.history.includes(id) || this.queue.includes(id)) {
+          continue
+        }
+
         this.queue.push(id)
       }
     }
@@ -88,11 +97,20 @@ export class Squad {
     return this.env
   }
 
+  private recalculateInDegree(id: string) {
+    const node = this.nodes.find(t => t.id === id)!
+    const dependencies = node.adjancentFrom
+    return dependencies.filter(d => !this.history.includes(d)).length
+  }
+
   private findNextNode(ids: string[]) {
-    const sortedNodes = this.graph
-      .topologicallySortedNodes()
-      .map(id => this.nodes.find(t => t.id === id)!)
-    return sortedNodes.find(n => ids.includes(n.id))
+    for (let id of ids) {
+      const degree: number = this.recalculateInDegree(id)
+      if (degree === 0) {
+        return this.nodes.find(t => t.id === id)
+      }
+    }
+    return null
   }
 
   connect(from: Node, to: Node) {

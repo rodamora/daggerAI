@@ -200,7 +200,7 @@ export class Task extends Node {
 
   getAdditionalInstructions(squad: Squad) {
     if (squad.instructions) {
-      return `\n\n<additional_user_instructions>${squad.instructions}</additional_user_instructions>`
+      return `\n\n<important_user_instructions>${squad.instructions}</important_user_instructions>`
     }
     return ''
   }
