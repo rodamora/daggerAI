@@ -33,15 +33,14 @@
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.6",
-    "@types/node": "^20.12.7",
     "core-js": "^3.37.0",
-    "daggerai": "/home/rod/daggerai",
     "nanoid": "3.3.5",
     "openai": "^4.38.3",
     "typescript-graph": "^0.3.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/node": "^20.12.7",
     "dotenv": "^16.4.5",
     "rimraf": "^5.0.5",
     "typescript": "^5.4.5",
