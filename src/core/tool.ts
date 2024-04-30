@@ -3,7 +3,6 @@ import { interpolateVariablesIntoPrompt } from './helpers'
 import { SQUAD_PROMPTS } from './prompts'
 
 export interface Tool {
-  code: string
   name: string
   description: string
   params: Record<string, string>

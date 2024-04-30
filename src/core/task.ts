@@ -79,6 +79,14 @@ export class Task extends Node {
 
         if (nextStep instanceof AgentFinish) {
           this.output = nextStep.response
+
+          squad.events.emit('agent.finished', {
+            agent: this.agent.role,
+            name: this.name,
+            output: this.output,
+            task: this.id,
+          })
+
           return this.output
         }
 

@@ -1,11 +1,11 @@
-import EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import { nanoid } from 'nanoid'
 import { DirectedAcyclicGraph } from 'typescript-graph'
 import { SquadEventEmitter } from './events'
+import { removeDiacritics } from './helpers'
 import { Input, InputValue } from './input'
 import { Node, NodeTypes } from './node'
 import { Task } from './task'
-import { removeDiacritics } from './helpers'
 
 export interface SquadEvaluateParams {
   // the values of the input from the user
@@ -20,11 +20,12 @@ export class Squad {
   private order: Task[] = []
   private nodes: Node[] = []
   private history: string[] = []
-  public events: SquadEventEmitter = new EventEmitter()
 
   // additional instructions the user can send to the squad
   inputs: InputValue[] = []
   instructions: string = ''
+
+  events = new EventEmitter() as SquadEventEmitter
 
   async evaluate(params: SquadEvaluateParams) {
     this.inputs = params.inputs
@@ -44,9 +45,7 @@ export class Squad {
 
     // Keep running the loop until there are no more nodes to execute
     while (true) {
-      console.log('QUEUE:', this.queue)
       const nextNode = this.findNextNode(this.queue) as NodeTypes
-      console.log('RUNNING NODE:', nextNode?.name)
 
       if (!nextNode) {
         break
@@ -92,6 +91,11 @@ export class Squad {
         this.queue.push(id)
       }
     }
+
+    this.events.emit('squad.finished', {
+      name: 'Squad',
+      output: Object.values(this.env).join('\n\n'),
+    })
 
     // Return the environment object containing the results of all executed tasks
     return this.env
