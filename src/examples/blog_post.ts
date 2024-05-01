@@ -18,6 +18,7 @@ async function runSquad() {
   })
 
   const blogWriter = new Agent({
+    id: '1',
     role: 'Social Media Blog Writer',
     backstory:
       'As a Social Media Blog Writer, I create engaging and shareable content tailored to a target audience. From topic ideation to keyword research and captivating introductions, I deliver high-quality blog posts that drive traffic and engagement.',

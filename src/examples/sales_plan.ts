@@ -22,6 +22,7 @@ async function runSquad() {
   // })
 
   const salesAssistant = new Agent({
+    id: '1',
     role: 'Sales Improver',
     backstory: 'You are a sales specialist.',
     goal: 'You always want to increase sales',

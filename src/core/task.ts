@@ -58,7 +58,7 @@ export class Task extends Node {
     const toolRunner = new ToolRunner(this.tools, squad.events)
 
     squad.events.emit('agent.thinking', {
-      agent: this.agent.role,
+      agent: this.agent.id,
       name: this.name,
       task: this.id,
       output: `Executing task *${this.name}*`,
