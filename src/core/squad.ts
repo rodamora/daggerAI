@@ -13,6 +13,10 @@ export interface SquadEvaluateParams {
   instructions?: string
 }
 
+export interface SquadParams {
+  verbose?: boolean
+}
+
 export class Squad {
   private graph: DirectedAcyclicGraph<string> = new DirectedAcyclicGraph()
   private env: Record<string, string> = {}
@@ -26,6 +30,11 @@ export class Squad {
   instructions: string = ''
 
   events = new EventEmitter() as SquadEventEmitter
+  verbose: boolean = false
+
+  constructor(params: SquadParams = {}) {
+    this.verbose = params.verbose || false
+  }
 
   async evaluate(params: SquadEvaluateParams) {
     this.inputs = params.inputs

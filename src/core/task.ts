@@ -72,9 +72,16 @@ export class Task extends Node {
         let promptWithSteps =
           llmPrompt + this.buildIntermediateStepsPrompt(intermediateSteps)
 
-        logWithColor(`LLM Prompt: ${promptWithSteps}`, 'yellow')
+        if (squad.verbose) {
+          logWithColor(`LLM Prompt: ${promptWithSteps}`, 'yellow')
+        }
+
         const response = await this.llm.invoke(promptWithSteps)
-        logWithColor(response as string, 'green')
+
+        if (squad.verbose) {
+          logWithColor(response as string, 'green')
+        }
+
         const nextStep = llmParser.parse(response as string)
 
         if (nextStep instanceof AgentFinish) {
@@ -108,7 +115,9 @@ export class Task extends Node {
       } catch (error) {
         const err = error as Error
 
-        logWithColor(err.message, 'red')
+        if (squad.verbose) {
+          logWithColor(err.message, 'red')
+        }
 
         if (error instanceof ParserError) {
           intermediateSteps.push([null, error.observation])
