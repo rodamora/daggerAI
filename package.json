@@ -1,7 +1,7 @@
 {
   "name": "daggerai",
   "description": "A simple and powerful Typescript based agent framework to help businesses thrive in the AI Agent revolution.",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "private": false,
