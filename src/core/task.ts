@@ -138,9 +138,7 @@ export class Task extends Node {
 
   getToolsPrompt() {
     return interpolateVariablesIntoPrompt(SQUAD_PROMPTS.tools, {
-      tools: this.tools
-        .map(t => `Name: ${t.name} Description: ${t.description}`)
-        .join('\n'),
+      tools: this.tools.map(t => `[${t.name}]: ${t.description}`).join('\n'),
       toolNames: this.tools.map(t => t.name).join(', '),
     })
   }
