@@ -30,10 +30,19 @@ export function logWithColor(message: string, color: LogColor) {
     case 'red':
       bgColor = '\x1b[31m'
       break
+    case 'blue':
+      bgColor = '\x1b[34m' // Blue text
+      break
+    case 'magenta':
+      bgColor = '\x1b[35m' // Magenta text
+      break
+    case 'cyan':
+      bgColor = '\x1b[36m' // Cyan text
+      break
   }
   console.log(`${bgColor}%s${reset}`, message)
 }
-type LogColor = 'green' | 'yellow' | 'red'
+type LogColor = 'green' | 'yellow' | 'red' | 'blue' | 'magenta' | 'cyan'
 
 export function dedent(
   strings: TemplateStringsArray,

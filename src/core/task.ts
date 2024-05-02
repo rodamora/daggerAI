@@ -68,6 +68,10 @@ export class Task extends Node {
     let iterations = 0
 
     while (this.shouldContinue(iterations)) {
+      if (squad.verbose) {
+        logWithColor(`Running Iteration ${iterations}`, 'blue')
+      }
+
       try {
         let promptWithSteps =
           llmPrompt + this.buildIntermediateStepsPrompt(intermediateSteps)
@@ -83,6 +87,10 @@ export class Task extends Node {
         }
 
         const nextStep = llmParser.parse(response as string)
+
+        if (squad.verbose) {
+          logWithColor(`Next step: ${JSON.stringify(nextStep)}`, 'magenta')
+        }
 
         if (nextStep instanceof AgentFinish) {
           this.output = nextStep.response
@@ -126,6 +134,8 @@ export class Task extends Node {
         }
       }
 
+      logWithColor(`Finished iteration`, 'red')
+
       iterations++
     }
 
@@ -138,7 +148,7 @@ export class Task extends Node {
 
   getToolsPrompt() {
     return interpolateVariablesIntoPrompt(SQUAD_PROMPTS.tools, {
-      tools: this.tools.map(t => `[${t.name}]: ${t.description}`).join('\n'),
+      tools: this.tools.map(t => `${t.name}: ${t.description}`).join('\n'),
       toolNames: this.tools.map(t => t.name).join(', '),
     })
   }
@@ -152,7 +162,6 @@ export class Task extends Node {
         if (action) {
           prompt += `\n\n${action.log}`
         }
-
         if (observation) {
           prompt += `\nObservation: ${observation}`
         }
