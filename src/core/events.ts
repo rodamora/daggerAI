@@ -31,6 +31,7 @@ export interface SquadEvents {
   'squad.started': SquadRunEvent
   'squad.finished': SquadRunEvent
   'agent.started': AgentRunEvent
+  'agent.thinking': AgentRunEvent
   'agent.finished': AgentFinishedEvent
   'agent.failed': AgentRunEvent
   'tool.called': ToolCallEvent

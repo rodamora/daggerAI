@@ -82,6 +82,13 @@ export class Task extends Node {
           logWithColor(`LLM Prompt: ${promptWithSteps}`, 'yellow')
         }
 
+        squad.events.emit('agent.thinking', {
+          agent: this.agent.id,
+          name: this.name,
+          task: this.id,
+          output: '',
+        })
+
         const response = await this.llm.invoke(promptWithSteps)
 
         if (squad.verbose) {
@@ -178,7 +185,7 @@ export class Task extends Node {
         if (action) {
           prompt += `\n\n${action.log}`
         }
-        if (response) {
+        if (response && response.text) {
           prompt += `\nObservation: ${response.text}`
         }
       })
