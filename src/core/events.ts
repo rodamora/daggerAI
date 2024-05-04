@@ -1,4 +1,5 @@
-import { ToolCall } from './tool'
+import { Source } from './interfaces'
+import { ToolCall, ToolResponse } from './tool'
 
 import { EventEmitter as NodeEventEmitter } from 'events'
 
@@ -9,7 +10,15 @@ interface TypedEventEmitter<T>
   off<K extends keyof T>(event: K, listener: (args: T[K]) => void): this
 }
 
-export type ToolRunEvent = ToolCall & { output?: string }
+export type ToolCallEvent = ToolCall
+export type ToolResponseEvent = ToolResponse
+export type AgentFinishedEvent = {
+  agent: string
+  name: string
+  task: string
+  output: string
+  sources: Source[]
+}
 export type AgentRunEvent = {
   agent: string
   name: string
@@ -21,12 +30,12 @@ export type SquadRunEvent = { name: string; output?: string }
 export interface SquadEvents {
   'squad.started': SquadRunEvent
   'squad.finished': SquadRunEvent
-  'agent.thinking': AgentRunEvent
-  'agent.finished': AgentRunEvent
+  'agent.started': AgentRunEvent
+  'agent.finished': AgentFinishedEvent
   'agent.failed': AgentRunEvent
-  'tool.called': ToolRunEvent
-  'tool.finished': ToolRunEvent
-  'tool.failed': ToolRunEvent
+  'tool.called': ToolCallEvent
+  'tool.finished': ToolCall & ToolResponse
+  'tool.failed': ToolResponse
 }
 
 export type SquadEvent = SquadEvents

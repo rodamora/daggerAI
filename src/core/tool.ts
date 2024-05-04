@@ -1,16 +1,25 @@
+import { ZodSchema } from 'zod'
 import { SquadEventEmitter } from './events'
 import { interpolateVariablesIntoPrompt } from './helpers'
+import { JSONValue, Source } from './interfaces'
 import { SQUAD_PROMPTS } from './prompts'
 
 export interface Tool {
   name: string
   description: string
-  params: Record<string, string>
-  execute: (input: any) => Promise<string>
+  schema: ZodSchema
+  execute: (input: any) => Promise<ToolResponse>
+}
+
+export interface ToolResponse {
+  text: string
+  sources?: Source[]
+  actions?: ToolCall[]
+  metadata?: JSONValue
 }
 
 export interface ToolCall {
-  name: string
+  tool: string
   toolInput: object
 }
 
@@ -30,7 +39,7 @@ export class ToolRunner {
 
   async run(calling: ToolCall) {
     const toolNames = this.tools.map(t => t.name).join(', ')
-    const selectedTool = this.tools.find(tool => tool.name === calling.name)
+    const selectedTool = this.tools.find(tool => tool.name === calling.tool)
 
     // We limit the number of times we try to run a tool
     const hasToolAttemptsReachedMax = this.runAttempts >= this.maxRunAttemps
@@ -44,7 +53,7 @@ export class ToolRunner {
 
       this.events.emit('tool.failed', {
         ...calling,
-        output: 'Max attempts reached. Moving on.',
+        text: 'Max attempts reached. Moving on.',
       })
 
       return new ToolError(`\nMoving on then. ${formatPrompt}`)
@@ -56,22 +65,22 @@ export class ToolRunner {
 
       this.events.emit('tool.failed', {
         ...calling,
-        output: 'Action does not exist.',
+        text: 'Action does not exist.',
       })
 
       return new ToolError(
-        `Action '${calling.name}' don't exist, these are the only available Actions: ${toolNames}`,
+        `Action '${calling.tool}' don't exist, these are the only available Actions: ${toolNames}`,
       )
     }
 
     // Returns ToolError if the tool call does not have a name
-    const selectedToolHasName = calling.name
+    const selectedToolHasName = calling.tool
     if (!selectedToolHasName) {
       this.runAttempts++
 
       this.events.emit('tool.failed', {
         ...calling,
-        output: 'Forgot the action name.',
+        text: 'Forgot the action name.',
       })
 
       return new ToolError(
@@ -81,10 +90,10 @@ export class ToolRunner {
 
     try {
       this.events.emit('tool.called', calling)
-      const output = await selectedTool.execute(calling.toolInput)
-      this.events.emit('tool.finished', { ...calling, output })
+      const response = await selectedTool.execute(calling.toolInput)
+      this.events.emit('tool.finished', { ...calling, ...response })
 
-      return output as string
+      return response
     } catch (error) {
       return new ToolError(
         `I used the tool wrong, these are the correct instructions: ${selectedTool.description}`,

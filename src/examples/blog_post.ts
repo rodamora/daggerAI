@@ -80,7 +80,7 @@ async function runSquad() {
     console.log('Squad started!')
   })
 
-  squad.events.on('agent.thinking', task => {
+  squad.events.on('agent.started', task => {
     console.log(`Task started: ${task.name}`)
   })
 
@@ -89,11 +89,11 @@ async function runSquad() {
   })
 
   squad.events.on('tool.called', tool => {
-    console.log(`Tool called: ${tool.name}`)
+    console.log(`Tool called: ${tool.tool}`)
   })
 
   squad.events.on('tool.finished', tool => {
-    console.log(`Tool finished: ${tool.name}`)
+    console.log(`Tool finished: ${tool}`)
   })
 
   squad.events.on('squad.finished', () => {

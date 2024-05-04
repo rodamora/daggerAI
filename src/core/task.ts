@@ -2,6 +2,7 @@ import { LLM } from '../llm/base'
 import { Agent } from './agent'
 import {
   convertToXmlTag,
+  convertZodSchemaToJson,
   dedent,
   interpolateVariablesIntoPrompt,
   logWithColor,
@@ -12,13 +13,12 @@ import {
   AgentAction,
   AgentFinish,
   AgentStep,
-  Observation,
   ParserError,
   SquadResponseParser,
 } from './parser'
 import { SQUAD_PROMPTS } from './prompts'
 import { Squad } from './squad'
-import { Tool, ToolError, ToolRunner } from './tool'
+import { Tool, ToolError, ToolResponse, ToolRunner } from './tool'
 
 export class Task extends Node {
   override type: string = 'task'
@@ -57,15 +57,17 @@ export class Task extends Node {
     const llmParser = new SquadResponseParser()
     const toolRunner = new ToolRunner(this.tools, squad.events)
 
-    squad.events.emit('agent.thinking', {
+    squad.events.emit('agent.started', {
       agent: this.agent.id,
       name: this.name,
       task: this.id,
       output: `Executing task *${this.name}*`,
     })
 
-    let intermediateSteps: [AgentAction | null, Observation | undefined][] = []
+    let intermediateSteps: [AgentAction | null, ToolResponse | undefined][] = []
     let iterations = 0
+
+    let sources: any[] = []
 
     while (this.shouldContinue(iterations)) {
       if (squad.verbose) {
@@ -100,23 +102,32 @@ export class Task extends Node {
             name: this.name,
             output: this.output,
             task: this.id,
+            sources,
           })
 
           return this.output
         }
 
         if (nextStep instanceof AgentStep) {
-          intermediateSteps.push([nextStep.action, nextStep.observation])
+          intermediateSteps.push([
+            nextStep.action,
+            { text: nextStep.observation! },
+          ])
           const action = nextStep.action
 
           const output = await toolRunner.run({
-            name: action.tool,
+            tool: action.tool,
             toolInput: action.toolInput,
           })
 
           if (output instanceof ToolError) {
-            intermediateSteps.push([null, output.observation])
+            intermediateSteps.push([null, { text: output.observation }])
           } else {
+            logWithColor(`Tool output: ${JSON.stringify(output)}`, 'red')
+
+            if (output.sources) {
+              sources = [...sources, ...output.sources]
+            }
             intermediateSteps.push([null, output])
           }
         }
@@ -128,9 +139,9 @@ export class Task extends Node {
         }
 
         if (error instanceof ParserError) {
-          intermediateSteps.push([null, error.observation])
+          intermediateSteps.push([null, { text: error.observation }])
         } else {
-          intermediateSteps.push([null, err.message])
+          intermediateSteps.push([null, { text: err.message }])
         }
       }
 
@@ -148,22 +159,27 @@ export class Task extends Node {
 
   getToolsPrompt() {
     return interpolateVariablesIntoPrompt(SQUAD_PROMPTS.tools, {
-      tools: this.tools.map(t => `${t.name}: ${t.description}`).join('\n'),
       toolNames: this.tools.map(t => t.name).join(', '),
+      tools: this.tools
+        .map(
+          t =>
+            `${t.name}, the tool params: ${convertZodSchemaToJson(t.schema)}`,
+        )
+        .join('\n'),
     })
   }
 
   buildIntermediateStepsPrompt(
-    intermediateSteps: [AgentAction | null, Observation | undefined][],
+    intermediateSteps: [AgentAction | null, ToolResponse | undefined][],
   ) {
     let prompt = ''
     if (intermediateSteps.length) {
-      intermediateSteps.forEach(([action, observation]) => {
+      intermediateSteps.forEach(([action, response]) => {
         if (action) {
           prompt += `\n\n${action.log}`
         }
-        if (observation) {
-          prompt += `\nObservation: ${observation}`
+        if (response) {
+          prompt += `\nObservation: ${response.text}`
         }
       })
     }

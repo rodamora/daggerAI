@@ -1,4 +1,5 @@
-import { Tool } from '../core/tool'
+import { z } from 'zod'
+import { Tool, ToolResponse } from '../core/tool'
 
 export interface SerperToolParams {
   query: string
@@ -8,8 +9,10 @@ export class SerperTool implements Tool {
   code: string = 'serper'
   name: string = 'Serper Search'
   description: string =
-    'Use when you need to look up something on the internet. Input is a JSON with a key called "query".'
-  params: Record<string, string> = {}
+    'Use when you need to look up something on the internet.'
+  schema = z.object({
+    query: z.string(),
+  })
 
   constructor() {
     if (!process.env.SERPER_API_KEY) {
@@ -17,7 +20,7 @@ export class SerperTool implements Tool {
     }
   }
 
-  async execute(input: SerperToolParams): Promise<string> {
+  async execute(input: SerperToolParams): Promise<ToolResponse> {
     const options: RequestInit = {
       method: 'POST',
       headers: {
@@ -42,29 +45,29 @@ export class SerperTool implements Tool {
     const json = (await response.json()) as any
 
     if (json.answerBox?.answer) {
-      return json.answerBox.answer
+      return { text: json.answerBox.answer }
     }
 
     if (json.answerBox?.snippet) {
-      return json.answerBox.snippet
+      return { text: json.answerBox.snippet }
     }
 
     if (json.answerBox?.snippet_highlighted_words) {
-      return json.answerBox.snippet_highlighted_words[0]
+      return { text: json.answerBox.snippet_highlighted_words[0] }
     }
 
     if (json.sportsResults?.game_spotlight) {
-      return json.sportsResults.game_spotlight
+      return { text: json.sportsResults.game_spotlight }
     }
 
     if (json.knowledgeGraph?.description) {
-      return json.knowledgeGraph.description
+      return { text: json.knowledgeGraph.description }
     }
 
     if (json.organic?.[0]?.snippet) {
-      return json.organic[0].snippet
+      return { text: json.organic[0].snippet }
     }
 
-    return 'No good search result found'
+    return { text: 'No good search result found' }
   }
 }

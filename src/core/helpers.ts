@@ -1,3 +1,5 @@
+import { ZodSchema, z } from 'zod'
+
 export function interpolateVariablesIntoPrompt(
   prompt: string,
   variables: object,
@@ -75,4 +77,25 @@ export const removeDiacritics = (text: string): string => {
     .trim()
     .replace(p, c => b.charAt(a.indexOf(c)))
     .replace("'", '')
+}
+
+export const convertZodSchemaToJson = (schema: ZodSchema): any => {
+  const defDescription = schema._def.description || ''
+  const description = defDescription ? ` (${defDescription})` : ''
+  if (schema instanceof z.ZodObject) {
+    const shape = schema.shape
+    const objectSchema: any = {}
+    for (const key in shape) {
+      objectSchema[key] = convertZodSchemaToJson(shape[key])
+    }
+    return objectSchema
+  } else if (schema instanceof z.ZodString) {
+    return `string${description}`
+  } else if (schema instanceof z.ZodNumber) {
+    return `string${description}`
+  } else if (schema instanceof z.ZodArray) {
+    return `${convertZodSchemaToJson(schema.element)}[]${description}`
+  } else {
+    return 'unknown'
+  }
 }

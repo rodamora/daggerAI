@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
-import { Tool } from '../core/tool'
+import { Tool, ToolResponse } from '../core/tool'
+import { z } from 'zod'
 
 interface PerplexityToolParams {
   query: string
@@ -9,17 +10,14 @@ export class PerplexityTool implements Tool {
   code: string = 'perplexity'
   name = 'Perplexity Search'
   description =
-    'Use this tool when you have questions about any subject that could be searched on the internet. The only param is a JSON object with the key "query".'
+    'Use this tool when you have questions about any subject that could be searched on the internet.'
+  schema = z.object({
+    query: z.string(),
+  })
 
-  params: Record<string, string> = {}
-
-  constructor(apiKey?: string) {
-    this.params.apiKey = apiKey || process.env.PERPLEXITY_API_KEY!
-  }
-
-  async execute(input: PerplexityToolParams) {
+  async execute(input: PerplexityToolParams): Promise<ToolResponse> {
     const api = new OpenAI({
-      apiKey: this.params.apiKey,
+      apiKey: process.env.PERPLEXITY_API_KEY,
       baseURL: 'https://api.perplexity.ai',
     })
     const response = await api.chat.completions.create({
@@ -37,6 +35,9 @@ export class PerplexityTool implements Tool {
       ],
     })
 
-    return response.choices[0]?.message.content || 'No response from the model.'
+    return {
+      text:
+        response.choices[0]?.message.content || 'No response from the model.',
+    }
   }
 }
