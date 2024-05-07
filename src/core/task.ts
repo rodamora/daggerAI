@@ -170,7 +170,9 @@ export class Task extends Node {
       tools: this.tools
         .map(
           t =>
-            `${t.name}, the tool params: ${convertZodSchemaToJson(t.schema)}`,
+            `${t.name}, ${t.description}. Params: ${convertZodSchemaToJson(
+              t.schema,
+            )}`,
         )
         .join('\n'),
     })
